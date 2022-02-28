@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Monitoring{% endblock %}
+
+{% block stylesheets %}
+     <link rel="stylesheet" href="/assets/css/style.css">
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        // Get all elements with class="closebtn"
+        var close = document.getElementsByClassName("closebtn");
+        var i;
+
+        // Loop through all close buttons
+        for (i = 0; i < close.length; i++) {
+        // When someone clicks on a close button
+            close[i].onclick = function(){
+
+                // Get the parent of <span class="closebtn"> (<div class="alert">)
+                var div = this.parentElement;
+
+                // Set the opacity of div to 0 (transparent)
+                div.style.opacity = "0";
+
+                // Hide the div after 600ms (the same amount of milliseconds it takes to fade out)
+                setTimeout(function(){ div.style.display = "none"; }, 600);
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="container text-center text-white">
+        <h1 class="fw-light mb-2">Monitoring Apps</h1>
+        <p class="lead">Votre site de monitoring en ligne.</p>
+    </div> <br>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert"> 
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>{{message}}
+         </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div class="alert-warning">
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>{{message}}
+        </div>
+    {% endfor %}
+    
+    <div class="container">
+        {% set i = 0 %}
+        {% set background = ["#2196f3", "#e91e63", "#23c186"] %}
+        {% for website in websites %}
+            {% set i = i + 1 %}
+            {% set countStatus = website.statuses|length %}
+            {% if countStatus > 0 %}
+                {% set status = website.statuses [ countStatus - 1] %}            
+                <div class="card">
+                    <div class="box">
+                        <div class="content">
+                            <h2>
+                                {% if (i < 10) %}
+                                    {{"0"~i }}
+                                {% else %}
+                                    {{ i }}
+                                {% endif %}
+                            </h2>
+                            <h3>
+                                {{ website.name|capitalize }} 
+                                {% if status != null %}
+                                    {% set code = status.code %}
+                                    {% if code == 200 or code == 301 or code == 302 %}
+                                        <i class="fa fa-check-circle" aria-hidden="true" style="color:green;"></i>
+                                    {% elseif code == 404 %}
+                                        <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color:yellow;"></i>
+                                    {% else %}
+                                        <i class="fa fa-exclamation-circle" aria-hidden="true" style="color:red;"></i>  
+                                    {% endif %}                                
+                                {% endif %}
+                            </h3>
+                            <small>{{ website.url }}</small>
+                            <p>{{website.description|raw}}</p>
+                            <a href="{{ path('app_show_website', {id:website.id}) }}"  style="background:{{ background[i%3] }}"><i class="fa fa-eye"></i> Voir plus</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}
