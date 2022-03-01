@@ -80,7 +80,7 @@
                                 {% endif %}
                             </h3>
                             <small>{{ website.url }}</small>
-                            <p>{{website.description|raw}}</p>
+                            <p>{{(website.description|extractText(100))|raw}}</p>
                             <a href="{{ path('app_show_website', {id:website.id}) }}"  style="background:{{ background[i%3] }}"><i class="fa fa-eye"></i> Voir plus</a>
                         </div>
                     </div>
